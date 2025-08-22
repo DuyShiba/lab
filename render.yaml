@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: lab1-app
+    env: java
+    buildCommand: "mvn clean install -DskipTests"
+    startCommand: "java -jar target/lab1-1.0-SNAPSHOT.jar"
+    plan: free
