@@ -1,26 +1,14 @@
-# -------- Build Stage --------
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Sử dụng Tomcat với JDK 17
+FROM tomcat:10.1-jdk17
 
-# Thiết lập thư mục làm việc
-WORKDIR /app
+# Xóa webapps mặc định nếu muốn
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Copy toàn bộ code vào container
-COPY . .
+# Copy file WAR từ target vào Tomcat (ROOT.war để chạy trên /)
+COPY target/lab1-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 
-# Build project Maven, bỏ test cho nhanh
-RUN mvn clean package -DskipTests
+# Expose port cho Render
+EXPOSE 8080
 
-# -------- Run Stage --------
-FROM eclipse-temurin:17-jdk
-
-WORKDIR /app
-
-# Copy file jar đã build từ stage trước
-COPY --from=build /app/target/*.jar app.jar
-
-# Expose port cho Render (Render sẽ map biến $PORT)
-ENV PORT 8080
-EXPOSE $PORT
-
-# Lệnh chạy ứng dụng
-CMD ["java", "-jar", "app.jar"]
+# Lệnh chạy Tomcat
+CMD ["catalina.sh", "run"]
